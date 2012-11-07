@@ -1,0 +1,5 @@
+This is a little project to do genetic programming over a distributed system
+using AMQP.
+
+It's not really ready at the moment, so don't really bother playing with it
+unless you're up for a bit of work ;)
