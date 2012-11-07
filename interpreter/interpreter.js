@@ -162,6 +162,13 @@ var gin = function(arr, env){
 // Exports the gin interpreter
 exports.gin = gin;
 
+// Load the standard lib
+var lib = require("./lib").lib;
+
+lib.forEach(function(sexp){
+  gin(sexp);
+});
+
 // Execute a file in the standard environment
 exports.exec = function(file, env){
   var fs = require("fs");
@@ -172,12 +179,6 @@ exports.exec = function(file, env){
       throw err;
     }
 
-    var lib = require("./lib").lib;
-
-    lib.forEach(function(sexp){
-      gin(sexp, env);
-    });
-    
     // strip out comments
     data = data.replace(/\/\/.*?\n/g, '');
 
