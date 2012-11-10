@@ -1,0 +1,14 @@
+{
+  "batchSize": 2,
+  "numBatches": 2,
+  "terminals": ["R", 1],
+  "functions": [
+    ["+", 2],
+    ["-", 2],
+    ["*", 2],
+    ["/", 2],
+    ["sqrt", 1]
+  ],
+  "fitness": [
+  ]
+}
