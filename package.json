@@ -1,7 +1,7 @@
 {
   "name": "gin",
   "version": "0.0.1",
-  "description": "distributed genetic programming system",
+  "description": "genetic programming system",
   "keywords": "genetic programming", "ai",
   "author": "Rob Britton <rob@robbritton.com>",
   "repository": { "type": "git", "url" : "https://github.com/robbrit/gin" },
@@ -9,4 +9,7 @@
   "dependencies" : {
     "mocha": ">= 1.6.0",
   },
+  "scripts": {
+    "start": "coffee gin"
+  }
 }
