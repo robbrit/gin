@@ -10,7 +10,7 @@ arith = (name, ident, op) ->
     if op is undefined
       args.reduce ident
     else
-      args.reduce op.ident
+      args.reduce op, ident
   ]
 
 exports.lib = [
@@ -21,7 +21,7 @@ exports.lib = [
   arith("%", (a, b) -> a % b),
 
   # Comparison/logical operators
-  ['defun', '=', [], (args) -> args[0] === args[1]],
+  ['defun', '=', [], (args) -> args[0] == args[1]],
   ['defun', '>', [], (args) -> args[0] > args[1]],
   ['defun', '>=', [], (args) -> args[0] >= args[1]],
   ['defun', '<', [], (args) -> args[0] < args[1]],

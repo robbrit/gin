@@ -1,16 +1,17 @@
 # global scope
-globalEnv = {}
+exports.globalEnv = {}
 
 # Helper function to merge several objects and return the result
 merge = ->
   res = {}
-  for i = 0; i < arguments.length; i++
-    for name in arguments[i]
-      res[name] = arguments[i][name]
+  for key, arg of arguments
+    for name, value of arg
+      res[name] = value
   res
 
+# Test if something is an array
 isArray = (obj) ->
-  Object.prototype.toString.call(obj) === '[object Array]'
+  Object.prototype.toString.call(obj) == '[object Array]'
 
 # A set of special forms. The main difference between these and functions is that
 # the arguments are not evaluated when they are passed in, where with functions the
@@ -21,22 +22,22 @@ specialForms =
     throw "defun requires at least 3 arguments!" if arr.length <= 2
 
     funcName = arr[0]
-
+    
     if typeof(arr[2]) == "function"
       # native function - wrap it with a function
-      definingEnvironment[funcName] = (args, callingEnvironment) ->
-        evalled = new Array args.length
-        evalled = gin arg, callingEnvironment for arg in args
+      res = (args, callingEnvironment) ->
+        evalled = (gin arg, callingEnvironment for arg in args)
 
         arr[2](evalled)
-      
+
+      definingEnvironment[funcName] = res
     else
-      # function defined in JISP, create it as a lambda and bind this environment to it.
+      # function defined in gin, create it as a lambda and bind this environment to it.
       # this will automatically handle recursive calls
       definingEnvironment[funcName] =
         specialForms.lambda arr.slice(1), definingEnvironment
 
-    null
+    definingEnvironment[funcName]
 
     # do a comparison
   "if": (arr, env) ->
@@ -65,7 +66,10 @@ specialForms =
     localScope = merge env, localScope
 
     # evaluate all elements, return the last one
-    gin b, localScope for b in body
+    for b in body
+      res = gin b, localScope
+
+    res
 
   # Sets the value of a variable in the environment
   "set!": (arr, env) ->
@@ -73,7 +77,7 @@ specialForms =
     env[arr[0]]
 
   # quotes something and doesn't eval it
-  quote: (arr, env)
+  quote: (arr, env) ->
     arr[0]
 
   # Opposite of quote: executes the first argument
@@ -90,9 +94,9 @@ specialForms =
     body = arr.slice 1
     (args, dynamicEnvironment) ->
       bindings = []
-      for (i = 0; i < argNames.length; i++){
+      for i in [0...argNames.length]
         bindings.push [argNames[i], args[i]]
-      }
+
       # This is probably not the best way to do it - the arguments should be evaluated in the dynamic
       # environment, but the body itself should be executed in the lexical environment
       specialForms.let [bindings].concat(body),
@@ -100,7 +104,7 @@ specialForms =
 
 # Evaluate a sexp in a certain environment
 gin = (arr, env) ->
-  env or= globalEnv
+  env = env || exports.globalEnv
 
   if not isArray arr
     # either a constant or a variable - no string literals in gin (yet)
@@ -125,7 +129,7 @@ gin = (arr, env) ->
     # Evaluate the function parameter
     what = gin funcName, env
 
-    if typeof(what) === 'function'
+    if typeof(what) == 'function'
       # what will probably be a lambda expression and will handle
       # the evaluation of the arguments correctly
       what args, env
@@ -143,7 +147,7 @@ lib.forEach (sexp) -> gin(sexp)
 # Execute a file in the standard environment
 exports.exec = (file, env) ->
   fs = require "fs"
-  env or= globalEnv
+  env = env || exports.globalEnv
 
   fs.readFile file, "utf-8", (err, data) ->
     throw err if err
