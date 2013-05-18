@@ -3,7 +3,7 @@ Gin is a system for genetic programming using Node.js.
 Installation
 ------------
 
-    npm install gin
+    npm install gin-gp
 
 Dependencies
 ------------

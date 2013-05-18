@@ -1,6 +1,6 @@
 {
-  "name": "gin",
-  "version": "0.0.2",
+  "name": "gin-gp",
+  "version": "0.0.1",
   "description": "genetic programming system",
   "keywords": ["genetic programming", "ai"],
   "author": "Rob Britton <rob@robbritton.com>",
