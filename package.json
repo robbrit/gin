@@ -16,7 +16,6 @@
     "clone": "*"
   },
   "scripts": {
-    "start": "coffee gin",
     "test": "mocha --compilers coffee:coffee-script --reporter nyan"
   }
 }
