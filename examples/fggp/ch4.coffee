@@ -14,14 +14,15 @@ xjson = require("xjson").xjson
 # normal division which will give you an undefined result when you divide by
 # zero, so we define a protected divide that will return 0 if the divisor is
 # zero.
-xjson ["defun", "%", ["a", "b"],
-        ["if", ["=", "b", 0],
-               0,
-               ["/", "a", "b"]]]
+global.safeDiv = (a, b) ->
+  if b == 0
+    0
+  else
+    a / b
 
 g = new gin.Gin(
   # Population size
-  popSize: 1000
+  popSize: 100
 
   # The function set to be used - for this problem we just use the four basic
   # arithmetic operations
@@ -29,7 +30,7 @@ g = new gin.Gin(
     ["+", 2],
     ["-", 2],
     ["*", 2],
-    ["%", 2]
+    ["safeDiv", 2]
   ],
   
   # The terminal set to be used:
@@ -46,7 +47,7 @@ g = new gin.Gin(
   variables: ["x"],
 
   # Maximum number of generations the system is going to perform
-  maxGenerations: 1000
+  maxGenerations: 100
 
   # Probability of various operations:
   # 90% crossover, 9% reproduce, 1% mutation
@@ -58,9 +59,9 @@ g = new gin.Gin(
   # The fitness function - evaluates the fitness of a given program
   fitness: (tree) ->
     # The fitness will be the absolute error between the function's output and
-    # the actual function (x^2 + x + 1) on 0.1 increment steps in the interval
-    # -1..1
-    x = -1.0
+    # the actual function (x^2 + x + 1) on 0.125 increment steps in the interval
+    # -2..2
+    x = -2.0
     error = 0
 
     # in addition, we will add in a parsimony factor to keep trees from getting
@@ -73,13 +74,12 @@ g = new gin.Gin(
       1
     else
       # calculate errors for various values of x
-      while x <= 1.0
+      while x <= 2.0
         value = tree(x)
         realValue = x * x + x + 1
         diff = value - realValue
-        #error += Math.abs(diff)
         error += diff * diff
-        x += 0.1
+        x += 0.125
 
       # Finally, truncate the fitness so that it is the range 1..100
       Math.max 1, 100 - Math.sqrt(error) - numSymbols
@@ -87,13 +87,8 @@ g = new gin.Gin(
   # Termination function: accepts a time value, which is the generation we
   # are currently running; and an array of fitness values
   termination: (t, fitness) ->
-    # Display some stuff that is useful
-    #console.log "Step #{t}:"
-    #console.log "best = #{g.currentStats.maxFitness}"
-    #console.log "avg = #{g.currentStats.avgFitness}"
-
     # stop if the best fitness is at least 90
-    g.currentStats.maxFitness >= 90
+    g.currentStats.maxFitness >= 98
 )
 
 # Generate the initial population
@@ -102,7 +97,7 @@ g.generate()
 # Begin executing generation after generation - this will stop when either
 # we hit the maximum number of generations, or until the termination function
 # is satisfied
-#g.run()
+g.run()
 
-# Display the individual with the best fitness score
 console.log g._pprint(g.population[g.currentStats.best])
+console.log g.currentStats.maxFitness

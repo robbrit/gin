@@ -323,9 +323,10 @@ class Gin
 
   # calculates the fitness of all individuals
   _calculateFitness: =>
-    @fitness = @population.map (tree) =>
-      code = ls.compile xjson.toLisp(tree), @options.variables
-      @options.fitness code
+    @compiled = @population.map (tree) =>
+      ls.compile xjson.toLisp(tree), @options.variables
+
+    @fitness = @compiled.map @options.fitness
 
     @totalFitness = _.reduce @fitness, ((s, i) -> s + i), 0.0
     @currentStats = @_calculateStats()
