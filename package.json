@@ -13,7 +13,8 @@
     "xjson": "*",
     "underscore": "*",
     "randgen": "*",
-    "clone": "*"
+    "clone": "*",
+    "lispyscript": "git://github.com/robbrit/lispyscript"
   },
   "scripts": {
     "test": "mocha --compilers coffee:coffee-script --reporter nyan"

@@ -1,4 +1,5 @@
-xjson = require("xjson").xjson
+xjson = require "xjson"
+ls = require "lispyscript"
 _ = require "underscore"
 randgen = require "randgen"
 clone = require "clone"
@@ -10,6 +11,7 @@ class Gin
   # - functions: array of function names. array elements should be pairs:
   #              (name of function, arity of function)
   # - terminals: array of terminals
+  # - variables: array of input variables
   # - fitness: function that accepts a tree and returns a number
   # - popSize: (default: 100) size of the population
   # - maxInitialDepth: (default: 5) maximum initial depth of the trees
@@ -321,7 +323,10 @@ class Gin
 
   # calculates the fitness of all individuals
   _calculateFitness: =>
-    @fitness = (@options.fitness tree for tree in @population)
+    @fitness = @population.map (tree) =>
+      code = ls.compile xjson.toLisp(tree), @options.variables
+      @options.fitness code
+
     @totalFitness = _.reduce @fitness, ((s, i) -> s + i), 0.0
     @currentStats = @_calculateStats()
     @stats.push @currentStats

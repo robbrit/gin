@@ -21,7 +21,7 @@ xjson ["defun", "%", ["a", "b"],
 
 g = new gin.Gin(
   # Population size
-  popSize: 10
+  popSize: 1000
 
   # The function set to be used - for this problem we just use the four basic
   # arithmetic operations
@@ -42,8 +42,11 @@ g = new gin.Gin(
     "R(-5, 5)"
   ],
 
+  # Input variables
+  variables: ["x"],
+
   # Maximum number of generations the system is going to perform
-  maxGenerations: 100
+  maxGenerations: 1000
 
   # Probability of various operations:
   # 90% crossover, 9% reproduce, 1% mutation
@@ -71,22 +74,23 @@ g = new gin.Gin(
     else
       # calculate errors for various values of x
       while x <= 1.0
-        value = xjson ["let", [ ["x", x] ], tree]
+        value = tree(x)
         realValue = x * x + x + 1
         diff = value - realValue
-        error += Math.abs(diff)
+        #error += Math.abs(diff)
+        error += diff * diff
         x += 0.1
 
       # Finally, truncate the fitness so that it is the range 1..100
-      Math.max 1, 100 - error - numSymbols
+      Math.max 1, 100 - Math.sqrt(error) - numSymbols
 
   # Termination function: accepts a time value, which is the generation we
   # are currently running; and an array of fitness values
   termination: (t, fitness) ->
     # Display some stuff that is useful
-    console.log "Step #{t}:"
-    console.log "best = #{g.currentStats.maxFitness}"
-    console.log "avg = #{g.currentStats.avgFitness}"
+    #console.log "Step #{t}:"
+    #console.log "best = #{g.currentStats.maxFitness}"
+    #console.log "avg = #{g.currentStats.avgFitness}"
 
     # stop if the best fitness is at least 90
     g.currentStats.maxFitness >= 90
@@ -98,7 +102,7 @@ g.generate()
 # Begin executing generation after generation - this will stop when either
 # we hit the maximum number of generations, or until the termination function
 # is satisfied
-g.run()
+#g.run()
 
 # Display the individual with the best fitness score
 console.log g._pprint(g.population[g.currentStats.best])
